@@ -1,48 +1,42 @@
 package com.example.hemanth.gestures;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.ImageView;
-import android.widget.TextView;
+
+
 
 public class MainActivity extends Activity implements
         GestureDetector.OnGestureListener,
-        GestureDetector.OnDoubleTapListener{
+        GestureDetector.OnDoubleTapListener {
 
     private static final String DEBUG_TAG = "Gestures";
     private GestureDetectorCompat mDetector;
-    private TextView textview;
     private double lastdiff = 0;
     private ImageView image;
     private Bitmap bitmap;
+    private float zoomScale = 0.1f;
+    private float translationScale = 15f;
+    private ZoomImage object;
+    private Context context = this;
 
     // Called when the activity is first created.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        image = (ImageView) findViewById(R.id.image);
-
-        bitmap = BitmapFactory.decodeResource(getResources(),
-                R.drawable.image);
-
-        // Instantiate the gesture detector with the
-        // application context and an implementation of
-        // GestureDetector.OnGestureListener
+        image = (ImageView) findViewById(R.id.imagezoomview);
+        image.setImageDrawable(getDrawable(R.drawable.image));
         mDetector = new GestureDetectorCompat(this,this);
-        // Set the gesture detector as the double tap
-        // listener.
         mDetector.setOnDoubleTapListener(this);
-
-
     }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
@@ -84,8 +78,8 @@ public class MainActivity extends Activity implements
 
             if( d3 <= lastdiff) {
                 if(lastdiff!=0) {
-                    image.setScaleX(Math.max(Math.min(image.getScaleX() - 0.1f, 4f), 0.5f));  //scale type is betwn 0.5 to 4
-                    image.setScaleY(Math.max(Math.min(image.getScaleX() - 0.1f, 4f), 0.5f));
+                    image.setScaleX(Math.max(Math.min(image.getScaleX() - zoomScale, 4f), 0.5f));  //scale type is betwn 0.5 to 4
+                    image.setScaleY(Math.max(Math.min(image.getScaleX() - zoomScale, 4f), 0.5f));
 
                     float windowwidth = getWindowManager().getDefaultDisplay().getWidth();
                     float windowheight = getWindowManager().getDefaultDisplay().getHeight();
@@ -100,8 +94,8 @@ public class MainActivity extends Activity implements
 
             }else {
                 if(lastdiff!=0) {
-                    image.setScaleX(Math.max(Math.min(image.getScaleX() + 0.1f, 4f), 0.5f));
-                    image.setScaleY(Math.max(Math.min(image.getScaleX() + 0.1f, 4f), 0.5f));
+                    image.setScaleX(Math.max(Math.min(image.getScaleX() + zoomScale, 4f), 0.5f));
+                    image.setScaleY(Math.max(Math.min(image.getScaleX() + zoomScale, 4f), 0.5f));
                 }
                 lastdiff = d3;
             }
@@ -128,19 +122,19 @@ public class MainActivity extends Activity implements
             if(dx<=dy){
                 if(y11<y22){
                     System.out.println("Going down");                                     // going down
-                    image.setTranslationY(Math.min(image.getTranslationY() + 15,windowdiffY));
+                    image.setTranslationY(Math.min(image.getTranslationY() + translationScale,windowdiffY));
                 }else{
                     System.out.println("Going up");                                          // going up
-                    image.setTranslationY(Math.max(image.getTranslationY() - 15,-windowdiffY));
+                    image.setTranslationY(Math.max(image.getTranslationY() - translationScale,-windowdiffY));
                 }
 
             }else{
                 if(x11<x22){
                     System.out.println("Going right");                                            // going right
-                    image.setTranslationX(Math.min(image.getTranslationX() + 15,windowdiffX));
+                    image.setTranslationX(Math.min(image.getTranslationX() + translationScale,windowdiffX));
                 }else{
                     System.out.println("Going left");                                            //going left
-                    image.setTranslationX(Math.max(image.getTranslationX() - 15,-windowdiffX));
+                    image.setTranslationX(Math.max(image.getTranslationX() - translationScale,-windowdiffX));
                 }
 
             }
